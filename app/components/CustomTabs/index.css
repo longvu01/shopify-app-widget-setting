@@ -1,0 +1,17 @@
+.activeTab {
+  position: relative;
+
+  .Polaris-Button .Polaris-Text--root {
+    font-weight: bold;
+    color: #000;
+  }
+
+  .activeBarLine {
+    height: 3px;
+    background-color: rgba(239, 77, 47, 1);
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: -10px;
+  }
+}

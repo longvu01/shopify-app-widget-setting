@@ -1,0 +1,14 @@
+.textFieldWithColorPicker {
+  position: relative;
+}
+
+.openColorPickerButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  position: absolute;
+  top: 24px;
+  right: 0;
+  z-index: 9999;
+  cursor: pointer;
+}

@@ -1,4 +1,11 @@
-import { Button, Card, Collapsible, InlineStack, Text } from "@shopify/polaris";
+import {
+  Button,
+  Card,
+  Collapsible,
+  Icon,
+  InlineStack,
+  Text,
+} from "@shopify/polaris";
 import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -24,14 +31,20 @@ export default function CollapsibleCustom({
         <InlineStack gap="200">
           <span style={{ width: 20, marginLeft: -2 }}>{titleIcon}</span>
 
-          <Text variant="headingMd" as="h3">
+          <Text variant="headingMd" as="h3" tone="critical">
             {title}
           </Text>
         </InlineStack>
 
         <Button
           variant="monochromePlain"
-          icon={open ? CaretUpIcon : CaretDownIcon}
+          icon={
+            open ? (
+              <Icon source={CaretUpIcon} tone="critical" />
+            ) : (
+              <Icon source={CaretDownIcon} tone="critical" />
+            )
+          }
           size="large"
           onClick={handleToggle}
         />
