@@ -37,5 +37,6 @@ export const hex2Hsb = (hex: string) => {
     hue,
     saturation,
     brightness,
+    alpha: 1,
   };
 };

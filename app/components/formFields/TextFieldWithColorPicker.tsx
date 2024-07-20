@@ -1,29 +1,21 @@
-import type { HSBAColor } from "@shopify/polaris";
+import type { HSBAColor, TextFieldProps } from "@shopify/polaris";
 import { ColorPicker, Popover, TextField, hsbToHex } from "@shopify/polaris";
 import { useEffect, useState } from "react";
 import { checkIsHexColor, hex2Hsb } from "~/utils";
 import "./index.css";
+import { initColor } from "~/routes/app.setting/constant";
 
-const randomHex =
-  "#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0");
-
-const initColor = hex2Hsb(randomHex);
-
-interface ITextFieldWithColorPickerProps {
-  name: string;
-  label: string;
-  value: string;
+type ITextFieldWithColorPickerProps = {
   setValue: (color: string) => void;
-}
+} & Omit<TextFieldProps, "autoComplete">;
 
-export default function TextFieldWithColorPicker({
-  name,
-  label,
-  value,
-  setValue,
-}: ITextFieldWithColorPickerProps) {
+export default function TextFieldWithColorPicker(
+  props: ITextFieldWithColorPickerProps,
+) {
+  const { setValue, ...restProps } = props;
+
   const [popoverActive, setPopoverActive] = useState<boolean>(false);
-  const [color, setColor] = useState(initColor);
+  const [color, setColor] = useState<HSBAColor>();
   const [error, setError] = useState<string>("");
 
   const handleOpenColorPicker = () => {
@@ -31,6 +23,7 @@ export default function TextFieldWithColorPicker({
   };
 
   const handleChangeColor = (newColor: HSBAColor) => {
+    setError("");
     setColor(newColor);
     const colorHex = hsbToHex(newColor);
     setValue(colorHex);
@@ -53,20 +46,20 @@ export default function TextFieldWithColorPicker({
   };
 
   useEffect(() => {
-    const initHexColor = hsbToHex(initColor);
-    setValue(initHexColor);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!restProps.value) return;
+
+    const hsbColor = hex2Hsb(restProps.value);
+
+    setColor(hsbColor);
+  }, [restProps.value]);
 
   return (
     <div className="textFieldWithColorPicker">
       <TextField
-        name={name}
-        label={label}
         autoComplete="off"
         error={error}
-        value={value}
         onChange={handleChangeTextField}
+        {...restProps}
       />
 
       <Popover
@@ -76,7 +69,7 @@ export default function TextFieldWithColorPicker({
           <div
             className="openColorPickerButton"
             style={{
-              backgroundColor: hsbToHex(color),
+              backgroundColor: hsbToHex(color ?? initColor),
             }}
             onClick={handleOpenColorPicker}
           />
@@ -88,7 +81,10 @@ export default function TextFieldWithColorPicker({
         <Popover.Pane fixed>
           <Popover.Section>
             <div style={{ width: "200px", height: "200px" }}>
-              <ColorPicker color={color} onChange={handleChangeColor} />
+              <ColorPicker
+                color={color ?? initColor}
+                onChange={handleChangeColor}
+              />
             </div>
           </Popover.Section>
         </Popover.Pane>

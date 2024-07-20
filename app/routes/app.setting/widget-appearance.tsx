@@ -1,3 +1,4 @@
+import type { SelectProps } from "@shopify/polaris";
 import {
   BlockStack,
   Checkbox,
@@ -6,6 +7,7 @@ import {
   Select,
 } from "@shopify/polaris";
 import { PaintBrushFlatIcon } from "@shopify/polaris-icons";
+import { useCallback } from "react";
 import CollapsibleCustom from "~/components/CollapsibleCustom";
 import TextFieldWithColorPicker from "~/components/formFields/TextFieldWithColorPicker";
 import {
@@ -22,11 +24,13 @@ import type { IFieldsChangeParams } from "./types";
 
 interface IWidgetAppearanceProps {
   formState: IWidgetSetting;
+  formErrors: IWidgetSetting;
   onFieldChange: (params: IFieldsChangeParams) => void;
 }
 
 export default function WidgetAppearance({
   formState,
+  formErrors,
   onFieldChange,
 }: IWidgetAppearanceProps) {
   const { countries } = useGetCountries();
@@ -38,6 +42,24 @@ export default function WidgetAppearance({
     });
   };
 
+  const genCommonFieldProps = useCallback(
+    (
+      fieldName: keyof IWidgetSetting["appearance"],
+      options: any[],
+    ): Partial<SelectProps> & { options: any[] } => {
+      return {
+        name: fieldName,
+        options: options,
+        error: formErrors.appearance[fieldName],
+        value: formState.appearance[fieldName],
+        onChange: (newValue) =>
+          handleChangeValue(newValue, WIDGET_SETTING_KEYS[fieldName]),
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formErrors.appearance, formState.appearance],
+  );
+
   return (
     <CollapsibleCustom
       title="Widget appearance"
@@ -46,27 +68,24 @@ export default function WidgetAppearance({
       <BlockStack gap={"200"}>
         <InlineGrid gap={"400"} columns={2}>
           <Select
-            name={WIDGET_SETTING_KEYS.layout}
             label="Layout"
-            options={APPEARANCE_LAYOUT_OPTIONS}
-            value={formState.appearance.layout}
-            onChange={(newValue) =>
-              handleChangeValue(newValue, WIDGET_SETTING_KEYS.layout)
-            }
+            {...genCommonFieldProps(
+              WIDGET_SETTING_KEYS.layout as keyof IWidgetSetting["appearance"],
+              APPEARANCE_LAYOUT_OPTIONS,
+            )}
           />
           <BlockStack>
             <Select
-              name={WIDGET_SETTING_KEYS.calendarLayout}
               label="Calendar layout"
-              options={CALENDAR_LAYOUT_OPTIONS}
-              value={formState.appearance.calendarLayout}
-              onChange={(newValue) =>
-                handleChangeValue(newValue, WIDGET_SETTING_KEYS.calendarLayout)
-              }
+              {...genCommonFieldProps(
+                WIDGET_SETTING_KEYS.calendarLayout as keyof IWidgetSetting["appearance"],
+                CALENDAR_LAYOUT_OPTIONS,
+              )}
             />
             <Checkbox
               name={WIDGET_SETTING_KEYS.alwaysOpen}
               label="Always open the calendar"
+              error={formErrors.appearance.alwaysOpen}
               checked={formState.appearance.alwaysOpen === EBooleanValue.TRUE}
               onChange={(newChecked) =>
                 onFieldChange({
@@ -80,39 +99,34 @@ export default function WidgetAppearance({
 
         <InlineGrid gap={"400"} columns={2}>
           <Select
-            name={WIDGET_SETTING_KEYS.calendarLang}
             label="Calendar language"
-            options={countries}
-            value={formState.appearance.calendarLang}
-            onChange={(newValue) =>
-              handleChangeValue(newValue, WIDGET_SETTING_KEYS.calendarLang)
-            }
+            {...genCommonFieldProps(
+              WIDGET_SETTING_KEYS.calendarLang as keyof IWidgetSetting["appearance"],
+              countries,
+            )}
           />
           <Select
-            name={WIDGET_SETTING_KEYS.firstDayCalendar}
             label="First day of calendar"
-            options={FIRST_DAY_OF_CALENDAR_OPTIONS}
-            value={formState.appearance.firstDayCalendar}
-            onChange={(newValue) =>
-              handleChangeValue(newValue, WIDGET_SETTING_KEYS.firstDayCalendar)
-            }
+            {...genCommonFieldProps(
+              WIDGET_SETTING_KEYS.firstDayCalendar as keyof IWidgetSetting["appearance"],
+              FIRST_DAY_OF_CALENDAR_OPTIONS,
+            )}
           />
         </InlineGrid>
 
         <InlineGrid gap={"400"} columns={2}>
           <Select
-            name={WIDGET_SETTING_KEYS.dateFormat}
             label="Date format"
-            options={DATE_FORMAT_OPTIONS}
-            value={formState.appearance.dateFormat}
-            onChange={(newValue) =>
-              handleChangeValue(newValue, WIDGET_SETTING_KEYS.dateFormat)
-            }
+            {...genCommonFieldProps(
+              WIDGET_SETTING_KEYS.firstDayCalendar as keyof IWidgetSetting["appearance"],
+              DATE_FORMAT_OPTIONS,
+            )}
           />
 
           <TextFieldWithColorPicker
             name={WIDGET_SETTING_KEYS.themeColor}
             label="Theme color"
+            error={formErrors.appearance.themeColor}
             value={formState.appearance.themeColor}
             setValue={(newValue) =>
               handleChangeValue(newValue, WIDGET_SETTING_KEYS.themeColor)
@@ -124,6 +138,7 @@ export default function WidgetAppearance({
           <TextFieldWithColorPicker
             name={WIDGET_SETTING_KEYS.titleColor}
             label="Title color"
+            error={formErrors.appearance.titleColor}
             value={formState.appearance.titleColor}
             setValue={(newValue) =>
               handleChangeValue(newValue, WIDGET_SETTING_KEYS.titleColor)
@@ -133,6 +148,7 @@ export default function WidgetAppearance({
           <TextFieldWithColorPicker
             name={WIDGET_SETTING_KEYS.requireTextColor}
             label="Required message text color"
+            error={formErrors.appearance.requireTextColor}
             value={formState.appearance.requireTextColor}
             setValue={(newValue) =>
               handleChangeValue(newValue, WIDGET_SETTING_KEYS.requireTextColor)

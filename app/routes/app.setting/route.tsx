@@ -1,15 +1,19 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { TitleBar } from "@shopify/app-bridge-react";
+import { SaveBar, TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { BlockStack, Form, Layout, Page } from "@shopify/polaris";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authenticate } from "~/shopify.server";
 import type { IWidgetSetting } from "~/types";
-import { DEFAULT_WIDGET_SETTINGS_STATE } from "./constant";
+import {
+  DEFAULT_WIDGET_SETTINGS_ERRORS,
+  DEFAULT_WIDGET_SETTINGS_STATE,
+} from "./constant";
 import type { IFieldsChangeParams } from "./types";
 import WidgetAppearance from "./widget-appearance";
 import WidgetPosition from "./widget-position";
 import WidgetText from "./widget-text";
+import { validateForm } from "./utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -25,11 +29,19 @@ export default function Setting() {
   const [formState, setFormState] = useState<IWidgetSetting>(
     DEFAULT_WIDGET_SETTINGS_STATE,
   );
+  const [formErrors, setFormErrors] = useState<IWidgetSetting>(
+    DEFAULT_WIDGET_SETTINGS_ERRORS,
+  );
+  const [isDirty, setIsDirty] = useState<boolean>(false);
+
+  const shopify = useAppBridge();
 
   const handleFieldsChange = (
     params: IFieldsChangeParams,
     section: "position" | "appearance" | "text",
   ) => {
+    setIsDirty(true);
+
     setFormState((prev) => ({
       ...prev,
       [section]: {
@@ -37,14 +49,45 @@ export default function Setting() {
         [params.name as unknown as string]: params.value,
       },
     }));
+
+    setFormErrors((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [params.name as unknown as string]: params.value
+          ? ""
+          : "This field is required",
+      },
+    }));
   };
 
   const handleSubmit = () => {
     console.log("handleSubmit", formState);
+
+    const error = validateForm(formState);
+
+    setFormErrors(error);
+    setIsDirty(false);
+    shopify.saveBar.hide("my-save-bar");
   };
+
+  const handleDiscardSave = () => {
+    setIsDirty(false);
+    setFormState(DEFAULT_WIDGET_SETTINGS_STATE);
+    shopify.saveBar.hide("my-save-bar");
+  };
+
+  useEffect(() => {
+    isDirty && shopify.saveBar.show("my-save-bar");
+  }, [isDirty, shopify]);
 
   return (
     <Page>
+      <SaveBar id="my-save-bar">
+        <button variant="primary" onClick={handleSubmit}></button>
+        <button onClick={handleDiscardSave}></button>
+      </SaveBar>
+
       <TitleBar title="Widget Setting" />
 
       <Layout>
@@ -53,6 +96,7 @@ export default function Setting() {
             <BlockStack gap={"200"}>
               <WidgetPosition
                 formState={formState}
+                formErrors={formErrors}
                 onFieldChange={(params: IFieldsChangeParams) =>
                   handleFieldsChange(params, "position")
                 }
@@ -60,6 +104,7 @@ export default function Setting() {
 
               <WidgetAppearance
                 formState={formState}
+                formErrors={formErrors}
                 onFieldChange={(params: IFieldsChangeParams) =>
                   handleFieldsChange(params, "appearance")
                 }
@@ -67,12 +112,12 @@ export default function Setting() {
 
               <WidgetText
                 formState={formState}
+                formErrors={formErrors}
                 onFieldChange={(params: IFieldsChangeParams) =>
                   handleFieldsChange(params, "text")
                 }
               />
             </BlockStack>
-            <button type="submit">Save</button>
           </Form>
         </Layout.Section>
       </Layout>
