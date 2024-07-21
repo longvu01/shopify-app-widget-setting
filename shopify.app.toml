@@ -3,7 +3,7 @@
 client_id = "872c8d8e86952b030569d3765da71211"
 name = "widget-setting"
 handle = "widget-setting"
-application_url = "https://subscribers-approval-do-reel.trycloudflare.com"
+application_url = "https://intersection-loading-spirituality-rocket.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://subscribers-approval-do-reel.trycloudflare.com/auth/callback",
-  "https://subscribers-approval-do-reel.trycloudflare.com/auth/shopify/callback",
-  "https://subscribers-approval-do-reel.trycloudflare.com/api/auth/callback"
+  "https://intersection-loading-spirituality-rocket.trycloudflare.com/auth/callback",
+  "https://intersection-loading-spirituality-rocket.trycloudflare.com/auth/shopify/callback",
+  "https://intersection-loading-spirituality-rocket.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

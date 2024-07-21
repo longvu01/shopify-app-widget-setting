@@ -3,10 +3,9 @@ import { BlockStack, Checkbox, Icon } from "@shopify/polaris";
 import { IconsFilledIcon } from "@shopify/polaris-icons";
 import CollapsibleCustom from "~/components/CollapsibleCustom";
 import { WIDGET_SETTING_KEYS } from "~/constants";
-import type { IFieldsChangeParams } from "./types";
 import type { IWidgetSetting, IWidgetSettingKeys } from "~/types";
 import { EBooleanValue } from "~/types";
-import { useCallback } from "react";
+import type { IFieldsChangeParams } from "./types";
 
 interface IWidgetPositionProps {
   formState: IWidgetSetting;
@@ -26,19 +25,17 @@ export default function WidgetPosition({
     });
   };
 
-  const genCommonFieldProps = useCallback(
-    (fieldName: keyof IWidgetSetting["position"]): Partial<CheckboxProps> => {
-      return {
-        name: fieldName,
-        error: formErrors.position[fieldName],
-        checked: formState.position[fieldName] === EBooleanValue.TRUE,
-        onChange: (newChecked) =>
-          handleChangeCheckBox(newChecked, WIDGET_SETTING_KEYS[fieldName]),
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formErrors.position, formState.position],
-  );
+  const genCommonFieldProps = (
+    fieldName: keyof IWidgetSetting["position"],
+  ): Partial<CheckboxProps> => {
+    return {
+      name: fieldName,
+      error: formErrors.position[fieldName],
+      checked: formState.position[fieldName] === EBooleanValue.TRUE,
+      onChange: (newChecked) =>
+        handleChangeCheckBox(newChecked, WIDGET_SETTING_KEYS[fieldName]),
+    };
+  };
 
   return (
     <CollapsibleCustom

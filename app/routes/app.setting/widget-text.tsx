@@ -1,7 +1,7 @@
 import type { TextFieldProps } from "@shopify/polaris";
 import { BlockStack, Icon, TextField } from "@shopify/polaris";
 import { TextIcon } from "@shopify/polaris-icons";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import CollapsibleCustom from "~/components/CollapsibleCustom";
 import CustomTabs from "~/components/CustomTabs";
 import { WIDGET_SETTING_KEYS } from "~/constants";
@@ -28,22 +28,18 @@ export default function WidgetText({
     });
   };
 
-  const genCommonFieldProps = useCallback(
-    (
-      fieldName: keyof IWidgetSetting["text"],
-    ): Partial<TextFieldProps> & { autoComplete: string } => {
-      return {
-        name: fieldName,
-        autoComplete: "off",
-        error: formErrors.text[fieldName],
-        value: formState.text[fieldName],
-        onChange: (newValue) =>
-          handleChangeValue(newValue, WIDGET_SETTING_KEYS[fieldName]),
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formErrors.text, formState.text],
-  );
+  const genCommonFieldProps = (
+    fieldName: keyof IWidgetSetting["text"],
+  ): Partial<TextFieldProps> & { autoComplete: string } => {
+    return {
+      name: fieldName,
+      autoComplete: "off",
+      error: formErrors.text[fieldName],
+      value: formState.text[fieldName],
+      onChange: (newValue) =>
+        handleChangeValue(newValue, WIDGET_SETTING_KEYS[fieldName]),
+    };
+  };
 
   const widgetTextTabs: ITab[] = [
     {

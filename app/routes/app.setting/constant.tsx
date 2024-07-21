@@ -1,3 +1,9 @@
+import {
+  APPEARANCE_LAYOUT_OPTIONS,
+  CALENDAR_LAYOUT_OPTIONS,
+  DATE_FORMAT_OPTIONS,
+  FIRST_DAY_OF_CALENDAR_OPTIONS,
+} from "~/constants";
 import type { IWidgetSetting } from "~/types";
 import { hex2Hsb } from "~/utils";
 
@@ -12,14 +18,14 @@ export const DEFAULT_WIDGET_SETTINGS_STATE: IWidgetSetting = {
     requireDeliveryDate: "",
   },
   appearance: {
-    layout: "",
-    calendarLayout: "",
+    layout: APPEARANCE_LAYOUT_OPTIONS[0].value,
+    calendarLayout: CALENDAR_LAYOUT_OPTIONS[0].value,
     alwaysOpen: "",
 
     calendarLang: "",
-    firstDayCalendar: "",
+    firstDayCalendar: FIRST_DAY_OF_CALENDAR_OPTIONS[0].value,
 
-    dateFormat: "",
+    dateFormat: DATE_FORMAT_OPTIONS[0].value,
     themeColor: randomHex,
 
     titleColor: randomHex,

@@ -7,7 +7,7 @@ import {
   Select,
 } from "@shopify/polaris";
 import { PaintBrushFlatIcon } from "@shopify/polaris-icons";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import CollapsibleCustom from "~/components/CollapsibleCustom";
 import TextFieldWithColorPicker from "~/components/formFields/TextFieldWithColorPicker";
 import {
@@ -42,23 +42,31 @@ export default function WidgetAppearance({
     });
   };
 
-  const genCommonFieldProps = useCallback(
-    (
-      fieldName: keyof IWidgetSetting["appearance"],
-      options: any[],
-    ): Partial<SelectProps> & { options: any[] } => {
-      return {
-        name: fieldName,
-        options: options,
-        error: formErrors.appearance[fieldName],
-        value: formState.appearance[fieldName],
-        onChange: (newValue) =>
-          handleChangeValue(newValue, WIDGET_SETTING_KEYS[fieldName]),
-      };
-    },
+  const genCommonFieldProps = (
+    fieldName: keyof IWidgetSetting["appearance"],
+    options: any[],
+  ): Partial<SelectProps> & { options: any[] } => {
+    return {
+      name: fieldName,
+      options: options,
+      error: formErrors.appearance[fieldName],
+      value: formState.appearance[fieldName],
+      onChange: (newValue) =>
+        handleChangeValue(newValue, WIDGET_SETTING_KEYS[fieldName]),
+    };
+  };
+
+  // Init calendarLang value
+  useEffect(() => {
+    if (!formState.appearance.calendarLang && countries.length > 0) {
+      onFieldChange({
+        name: WIDGET_SETTING_KEYS.calendarLang as unknown as IWidgetSettingKeys,
+        value: countries[0].value,
+        isInitValue: true,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formErrors.appearance, formState.appearance],
-  );
+  }, [countries, formState.appearance.calendarLang]);
 
   return (
     <CollapsibleCustom

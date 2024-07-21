@@ -40,7 +40,7 @@ export default function Setting() {
     params: IFieldsChangeParams,
     section: "position" | "appearance" | "text",
   ) => {
-    setIsDirty(true);
+    !params.isInitValue && setIsDirty(true);
 
     setFormState((prev) => ({
       ...prev,
@@ -62,11 +62,16 @@ export default function Setting() {
   };
 
   const handleSubmit = () => {
-    console.log("handleSubmit", formState);
+    const { formErrors, isHasError } = validateForm(formState);
 
-    const error = validateForm(formState);
+    if (isHasError) {
+      shopify.toast.show("Some fields are empty", { isError: true });
+    } else {
+      shopify.toast.show("Saved setting");
+      console.log("Saved setting", formState);
+    }
 
-    setFormErrors(error);
+    setFormErrors(formErrors);
     setIsDirty(false);
     shopify.saveBar.hide("my-save-bar");
   };
@@ -84,8 +89,8 @@ export default function Setting() {
   return (
     <Page>
       <SaveBar id="my-save-bar">
-        <button variant="primary" onClick={handleSubmit}></button>
-        <button onClick={handleDiscardSave}></button>
+        <button variant="primary" onClick={handleSubmit} />
+        <button onClick={handleDiscardSave} />
       </SaveBar>
 
       <TitleBar title="Widget Setting" />
