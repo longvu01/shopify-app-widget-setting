@@ -1,8 +1,9 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { SaveBar, TitleBar, useAppBridge } from "@shopify/app-bridge-react";
-import { BlockStack, Form, Layout, Page } from "@shopify/polaris";
-import { useEffect, useState } from "react";
+import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import { BlockStack, Layout, Page } from "@shopify/polaris";
+import type { FormEventHandler } from "react";
+import { useState } from "react";
 import { authenticate } from "~/shopify.server";
 import type { IWidgetSetting } from "~/types";
 import {
@@ -10,10 +11,10 @@ import {
   DEFAULT_WIDGET_SETTINGS_STATE,
 } from "./constant";
 import type { IFieldsChangeParams } from "./types";
+import { validateForm } from "./utils";
 import WidgetAppearance from "./widget-appearance";
 import WidgetPosition from "./widget-position";
 import WidgetText from "./widget-text";
-import { validateForm } from "./utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -32,7 +33,7 @@ export default function Setting() {
   const [formErrors, setFormErrors] = useState<IWidgetSetting>(
     DEFAULT_WIDGET_SETTINGS_ERRORS,
   );
-  const [isDirty, setIsDirty] = useState<boolean>(false);
+  // const [isDirty, setIsDirty] = useState<boolean>(false);
 
   const shopify = useAppBridge();
 
@@ -40,7 +41,7 @@ export default function Setting() {
     params: IFieldsChangeParams,
     section: "position" | "appearance" | "text",
   ) => {
-    !params.isInitValue && setIsDirty(true);
+    // !params.isInitValue && setIsDirty(true);
 
     setFormState((prev) => ({
       ...prev,
@@ -61,7 +62,9 @@ export default function Setting() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+
     const { formErrors, isHasError } = validateForm(formState);
 
     if (isHasError) {
@@ -72,32 +75,36 @@ export default function Setting() {
     }
 
     setFormErrors(formErrors);
-    setIsDirty(false);
-    shopify.saveBar.hide("my-save-bar");
+    // setIsDirty(false);
+    // shopify.saveBar.hide("my-save-bar");
   };
 
   const handleDiscardSave = () => {
-    setIsDirty(false);
+    // setIsDirty(false);
     setFormState(DEFAULT_WIDGET_SETTINGS_STATE);
-    shopify.saveBar.hide("my-save-bar");
+    // shopify.saveBar.hide("my-save-bar");
   };
 
-  useEffect(() => {
-    isDirty && shopify.saveBar.show("my-save-bar");
-  }, [isDirty, shopify]);
+  // useEffect(() => {
+  //   isDirty && shopify.saveBar.show("my-save-bar");
+  // }, [isDirty, shopify]);
 
   return (
     <Page>
-      <SaveBar id="my-save-bar">
+      {/* <SaveBar id="my-save-bar">
         <button variant="primary" onClick={handleSubmit} />
         <button onClick={handleDiscardSave} />
-      </SaveBar>
+      </SaveBar> */}
 
       <TitleBar title="Widget Setting" />
 
       <Layout>
         <Layout.Section>
-          <Form onSubmit={handleSubmit}>
+          <form
+            data-save-bar
+            onSubmit={handleSubmit}
+            onAbort={handleDiscardSave}
+          >
             <BlockStack gap={"200"}>
               <WidgetPosition
                 formState={formState}
@@ -123,7 +130,7 @@ export default function Setting() {
                 }
               />
             </BlockStack>
-          </Form>
+          </form>
         </Layout.Section>
       </Layout>
     </Page>
