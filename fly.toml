@@ -1,0 +1,28 @@
+# fly.toml app configuration file generated for widget-setting-2 on 2024-07-29T21:38:17+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'widget-setting-2'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  PORT = '3000'
+  SCOPES = ''
+  SHOPIFY_API_KEY = '32c935caf587e7eccde878fe241aa0d7'
+  SHOPIFY_APP_URL = 'https://widget-setting-2.fly.dev'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
